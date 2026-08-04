@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QUIZ DVA 2</title>
+<style>
+:root {
+  --azul:#0b1f3a; --azul2:#173d6b; --vermelho:#d62828; --verde:#16803c;
+  --cinza:#eef2f7; --texto:#172033; --branco:#fff; --amarelo:#fff4cc;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,Helvetica,sans-serif;background:linear-gradient(135deg,var(--azul),var(--azul2));color:var(--texto);min-height:100vh}
+.app{max-width:850px;margin:auto;min-height:100vh;background:#f8fafc;box-shadow:0 0 30px rgba(0,0,0,.28)}
+header{background:var(--azul);color:white;padding:20px;text-align:center;border-bottom:6px solid var(--vermelho)}
+header h1{margin:0;font-size:clamp(25px,5vw,40px)} header p{margin:8px 0 0;font-size:18px}
+.progress-wrap{background:#dfe7f0;height:12px} .progress{height:100%;width:0;background:var(--vermelho);transition:.3s}
+main{padding:18px}
+.card{background:white;border-radius:20px;padding:22px;box-shadow:0 7px 22px rgba(12,35,64,.13);margin-bottom:16px}
+.badge{display:inline-block;background:var(--vermelho);color:white;padding:8px 13px;border-radius:999px;font-weight:bold}
+.question{font-size:clamp(22px,4.5vw,32px);font-weight:800;line-height:1.3;margin:18px 0}
+.option{display:block;width:100%;text-align:left;margin:12px 0;padding:16px 18px;border:2px solid #cad5e2;background:#fff;border-radius:14px;font-size:20px;font-weight:700;cursor:pointer}
+.option:hover{border-color:var(--azul2);transform:translateY(-1px)}
+.option.correct{background:#dff6e7;border-color:var(--verde);color:#0b5d2a}
+.option.wrong{background:#fde2e2;border-color:var(--vermelho);color:#8f1515}
+.explanation{display:none;margin-top:18px;padding:18px;background:var(--amarelo);border-left:6px solid #e5a800;border-radius:12px;font-size:19px;line-height:1.5}
+.nav{display:flex;gap:12px;margin-top:18px} .nav button,.start button,.result button{flex:1;border:0;border-radius:14px;padding:16px;font-size:19px;font-weight:bold;cursor:pointer}
+.primary{background:var(--vermelho);color:white} .secondary{background:var(--azul);color:white}
+.start,.result{text-align:center;padding:30px 18px} .start h2,.result h2{font-size:34px;color:var(--azul)} .start p,.result p{font-size:20px;line-height:1.5}
+.hidden{display:none} .score{font-size:64px;font-weight:900;color:var(--vermelho);margin:15px 0}
+footer{padding:18px;text-align:center;background:var(--azul);color:white;font-weight:bold}
+@media(max-width:560px){main{padding:12px} .card{padding:17px} .option{font-size:18px} .nav{flex-direction:column}}
+</style>
+</head>
+<body>
+<div class="app">
+<header><h1>QUIZ DVA 2</h1><p>Curso de Contabilidade Professor Moreira</p></header>
+<div class="progress-wrap"><div id="progress" class="progress"></div></div>
+<main>
+<section id="start" class="start card">
+<h2>Demonstração do Valor Adicionado</h2>
+<p>Responda às 10 questões. Após marcar uma alternativa, veja imediatamente o gabarito comentado.</p>
+<button class="primary" onclick="startQuiz()">INICIAR QUIZ</button>
+</section>
+<section id="quiz" class="hidden">
+<div class="card">
+<span id="badge" class="badge"></span>
+<div id="question" class="question"></div>
+<div id="options"></div>
+<div id="explanation" class="explanation"></div>
+<div class="nav">
+<button class="secondary" onclick="prevQuestion()">← VOLTAR</button>
+<button class="primary" onclick="nextQuestion()">PRÓXIMA →</button>
+</div>
+</div>
+</section>
+<section id="result" class="result card hidden">
+<h2>Resultado Final</h2>
+<div id="score" class="score"></div>
+<p id="message"></p>
+<button class="primary" onclick="restartQuiz()">REINICIAR QUIZ</button>
+</section>
+</main>
+<footer>Professor Moreira • DVA • CPC 09</footer>
+</div>
+<script>
+const questions = [{"q": "Em relação à Demonstração do Valor Adicionado, assinale a alternativa correta.", "opts": ["A DVA evidencia a riqueza criada pela entidade e a forma como ela foi distribuída.", "A DVA demonstra apenas os lucros distribuídos aos acionistas.", "A DVA substitui a Demonstração do Resultado do Exercício.", "A DVA apresenta exclusivamente informações financeiras."], "ans": 0, "exp": "A finalidade central da DVA é evidenciar a criação e a distribuição da riqueza."}, {"q": "Na Demonstração do Valor Adicionado, os juros pagos sobre empréstimos bancários são classificados como:", "opts": ["Pessoal.", "Remuneração de Capital de Terceiros.", "Valor Adicionado Recebido em Transferência.", "Insumos adquiridos de terceiros."], "ans": 1, "exp": "Juros pagos remuneram recursos de terceiros e integram a distribuição do valor adicionado."}, {"q": "Uma companhia apresentou receita financeira de R$ 18.000, receita de equivalência patrimonial de R$ 22.000 e receita de aluguel de R$ 10.000. O Valor Adicionado Recebido em Transferência corresponde a:", "opts": ["R$ 22.000", "R$ 28.000", "R$ 50.000", "R$ 40.000"], "ans": 2, "exp": "18.000 + 22.000 + 10.000 = R$ 50.000."}, {"q": "De acordo com o CPC 09, a depreciação é apresentada na DVA:", "opts": ["Como remuneração de capital próprio.", "Como remuneração de capital de terceiros.", "Como distribuição ao governo.", "Como redução do Valor Adicionado Bruto para obtenção do Valor Adicionado Líquido."], "ans": 3, "exp": "A depreciação, amortização e exaustão são deduzidas do valor adicionado bruto para apuração do valor adicionado líquido produzido pela entidade."}, {"q": "Em relação aos empregados terceirizados, assinale a alternativa correta.", "opts": ["Seus pagamentos integram o grupo Pessoal.", "São classificados como remuneração de capital próprio.", "São considerados insumos adquiridos de terceiros.", "São classificados como tributos."], "ans": 2, "exp": "Serviços prestados por terceiros são insumos adquiridos de terceiros, não gastos com pessoal próprio."}, {"q": "Na distribuição do Valor Adicionado, os dividendos pagos aos acionistas são classificados como:", "opts": ["Remuneração de Capitais Próprios.", "Pessoal.", "Tributos.", "Valor Adicionado Recebido em Transferência."], "ans": 0, "exp": "Dividendos remuneram os proprietários da entidade e integram a remuneração de capitais próprios."}, {"q": "Uma companhia apresentou receita de vendas de R$ 900.000 e provisão para créditos de liquidação duvidosa de R$ 40.000. O valor a ser apresentado no grupo Receitas da DVA será:", "opts": ["R$ 820.000", "R$ 860.000", "R$ 900.000", "R$ 940.000"], "ans": 1, "exp": "900.000 − 40.000 = R$ 860.000."}, {"q": "Compõe o grupo Remuneração de Capital Próprio da DVA:", "opts": ["Juros sobre empréstimos.", "Aluguéis pagos.", "Dividendos distribuídos.", "Serviços de terceiros."], "ans": 2, "exp": "Dividendos distribuídos aos acionistas representam remuneração do capital próprio."}, {"q": "São componentes da primeira parte da DVA, exceto:", "opts": ["Receitas.", "Insumos adquiridos de terceiros.", "Valor Adicionado Recebido em Transferência.", "Remuneração de Capitais Próprios."], "ans": 3, "exp": "A remuneração de capitais próprios pertence à segunda parte, que trata da distribuição do valor adicionado."}, {"q": "Uma sociedade apresentou receita financeira de R$ 12.000, receita de aluguel de R$ 18.000 e receita de equivalência patrimonial de R$ 20.000. Na DVA, o Valor Adicionado Recebido em Transferência será:", "opts": ["R$ 32.000", "R$ 30.000", "R$ 38.000", "R$ 50.000"], "ans": 3, "exp": "12.000 + 18.000 + 20.000 = R$ 50.000."}];
+let current=0, score=0, answered=Array(questions.length).fill(null);
+
+function startQuiz(){
+ document.getElementById('start').classList.add('hidden');
+ document.getElementById('quiz').classList.remove('hidden');
+ render();
+}
+function render(){
+ const q=questions[current];
+ document.getElementById('badge').textContent=`Questão ${current+1} de ${questions.length}`;
+ document.getElementById('question').textContent=q.q;
+ document.getElementById('progress').style.width=((current+1)/questions.length*100)+'%';
+ const box=document.getElementById('options'); box.innerHTML='';
+ q.opts.forEach((o,i)=>{
+   const b=document.createElement('button'); b.className='option';
+   b.innerHTML=`<strong>${String.fromCharCode(65+i)})</strong> ${o}`;
+   b.onclick=()=>answer(i);
+   if(answered[current]!==null){
+     b.disabled=true;
+     if(i===q.ans)b.classList.add('correct');
+     if(i===answered[current] && i!==q.ans)b.classList.add('wrong');
+   }
+   box.appendChild(b);
+ });
+ const exp=document.getElementById('explanation');
+ if(answered[current]!==null){
+   exp.style.display='block';
+   const hit=answered[current]===q.ans;
+   exp.innerHTML=`<strong>${hit?'✅ Resposta correta!':'❌ Resposta incorreta.'}</strong><br><br><strong>Gabarito: ${String.fromCharCode(65+q.ans)}</strong><br>${q.exp}`;
+ } else exp.style.display='none';
+}
+function answer(i){
+ if(answered[current]!==null)return;
+ answered[current]=i;
+ if(i===questions[current].ans)score++;
+ render();
+}
+function nextQuestion(){
+ if(answered[current]===null){alert('Marque uma alternativa antes de continuar.');return;}
+ if(current<questions.length-1){current++;render();} else finish();
+}
+function prevQuestion(){if(current>0){current--;render();}}
+function finish(){
+ document.getElementById('quiz').classList.add('hidden');
+ document.getElementById('result').classList.remove('hidden');
+ document.getElementById('progress').style.width='100%';
+ document.getElementById('score').textContent=`${score}/10`;
+ let m=score===10?'Excelente! Você dominou o conteúdo de DVA.':score>=8?'Muito bom! Revise apenas os detalhes.':score>=6?'Bom resultado, mas ainda há pontos para revisar.':'Reforce a estrutura da DVA e tente novamente.';
+ document.getElementById('message').textContent=m;
+}
+function restartQuiz(){current=0;score=0;answered=Array(questions.length).fill(null);document.getElementById('result').classList.add('hidden');document.getElementById('quiz').classList.remove('hidden');render();}
+</script>
+</body></html>
